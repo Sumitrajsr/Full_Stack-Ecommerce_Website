@@ -217,28 +217,58 @@ export default function ProductList() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   const [filter, setFilter] = useState({});
+  const [sort, setSort] = useState({});
 
-  const handleFilter=(e,section,option)=>{
-    // e.preventDefault();
-    const newFilter={...filter,[section.id]:option.value};
+  // const handleFilter=(e,section,option)=>{
+  //   // e.preventDefault();
+  //   const newFilter={...filter};
+
+  //   //Todo : on server we will support multi value
+  //   if(e.target.checked){
+  //     newFilter[section.id].push(option.value);
+  //   }
+  //   else{
+  //    delete  newFilter[section.id];
+  //   }
+    
+  //   setFilter(newFilter);
+  //   console.log(section.id,option.value);
+
+  // }
+  const handleFilter = (e, section, option) => {
+    // const newFilter = { ...filter, [section.id]: option.value };
+    console.log(e.target.checked)
+    const newFilter = {...filter};
+    // TODO : on server it will support multiple categories
+    if(e.target.checked){
+      if(newFilter[section.id]){
+        newFilter[section.id].push(option.value)
+      } else{
+        newFilter[section.id] = [option.value]
+      }
+    } else{
+       const index = newFilter[section.id].findIndex(el=>el===option.value)
+       newFilter[section.id].splice(index,1);
+    }
+    console.log({newFilter});
+
     setFilter(newFilter);
-    dispatch(fetchProductsByFiltersAsync(newFilter));
-    console.log(section.id,option.value);
-
-  }
+   
+  };
   const handleSort=(e,option)=>{
     // e.preventDefault();
-    const newFilter={...filter,_sort:option.sort,_order:option.order};
-    setFilter(newFilter);
-    dispatch(fetchProductsByFiltersAsync(newFilter));
+    const sort={_sort:option.sort,_order:option.order};
+    setSort(sort);
+    
 
 
   }
 
   useEffect(()=>{
-    dispatch(fetchAllProductsAsync(filter))
-    setFilter({ })
-  },[dispatch])
+    dispatch(fetchProductsByFiltersAsync({filter,sort}));
+
+   
+  },[dispatch,filter])
 
   return (
     <div>
